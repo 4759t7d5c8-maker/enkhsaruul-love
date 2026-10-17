@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>For You ♥</title>
+<style>
+:root{--bg:#fde8ec;--ink:#5a2230;--red:#c0392b;--pink:#f4a7b5;--card:#fff8f6}
+@media (prefers-color-scheme:dark){:root{--bg:#2a1219;--ink:#ffe3e8;--card:#3a1c26}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 10%,var(--pink),var(--bg) 60%);font-family:"Segoe UI",system-ui,sans-serif;color:var(--ink);text-align:center;padding:20px}
+.screen{display:none;max-width:420px;width:100%;animation:in .6s}
+.screen.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1}}
+h1{font-size:2rem;color:var(--red);margin:.2em 0}
+.cat{font-size:4rem}
+.msg{font-weight:700;min-height:1.4em}
+.pct{font-size:1.8rem;color:var(--red);font-weight:800}
+svg{width:260px;max-width:90%}
+#needle{transform-origin:130px 130px;transition:transform .15s}
+input[type=range]{width:90%;accent-color:var(--red);margin:14px 0}
+button.main{background:var(--red);color:#fff;border:0;border-radius:30px;padding:12px 28px;font-size:1rem;cursor:pointer}
+button.main:disabled{opacity:.4}
+.gifts{display:flex;gap:14px;justify-content:center;margin:24px 0}
+.gift{font-size:4rem;background:none;border:0;cursor:pointer;transition:transform .2s}
+.gift:hover{transform:scale(1.15) rotate(-5deg)}
+.gift.done{opacity:.45}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px}
+.modal.on{display:flex}
+.card{background:var(--card);border-radius:18px;padding:24px;max-width:400px;width:100%;max-height:88vh;overflow:auto;border:2px dashed var(--pink)}
+.card h2{color:var(--red);margin-top:0}
+.bubble{background:var(--bg);border-radius:14px;padding:8px 12px;margin:8px 0;font-style:italic}
+.photo{width:100%;aspect-ratio:4/3;border-radius:10px;object-fit:cover;background:linear-gradient(#bfe0f5,#9bc48a)}
+.letter{text-align:left;line-height:1.6}
+.x{margin-top:14px}
+.hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.hearts span{position:absolute;bottom:-30px;animation:up linear forwards}
+@keyframes up{to{transform:translateY(-110vh)}}
+</style>
+</head>
+<body>
+
+<!-- 1. Love test -->
+<div class="screen on" id="s1">
+  <div class="cat" id="cat">🐱</div>
+  <div class="msg" id="msg">How much do you love me?</div>
+  <div class="pct" id="pct">0%</div>
+  <svg viewBox="0 0 260 150">
+    <path d="M20 130A110 110 0 0 1 240 130" fill="none" stroke="#e9a3ad" stroke-width="26"/>
+    <path d="M130 130L50 90" id="needle" stroke="#5a2230" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="130" cy="130" r="8" fill="#5a2230"/>
+    <text x="130" y="115" text-anchor="middle" font-size="18" fill="#c0392b" font-family="cursive">love</text>
+  </svg>
+  <input type="range" id="range" min="0" max="500" value="0">
+  <div><button class="main" id="go" disabled>Next ♥</button></div>
+</div>
+
+<!-- 2. Gifts -->
+<div class="screen" id="s2">
+  <h1>You passed the love test</h1>
+  <p>Your surprises are waiting for you</p>
+  <div class="gifts">
+    <button class="gift" data-m="m1">🎁</button>
+    <button class="gift" data-m="m2">🎁</button>
+    <button class="gift" data-m="m3">🎁</button>
+  </div>
+  <small>Tap each gift</small>
+</div>
+
+<!-- Modals (EDIT THE TEXT) -->
+<div class="modal" id="m1"><div class="card">
+  <h2>Your Bouquet 💐</h2>
+  <div class="bubble">You make my heart bloom.</div>
+  <div class="bubble">Everything feels sweeter with you.</div>
+  <div class="bubble">You make every moment sweeter.</div>
+  <button class="main x">Close</button>
+</div></div>
+
+<div class="modal" id="m2"><div class="card">
+  <h2>Our Memory 📸</h2>
+  <!-- Replace photo.jpg with your own photo file in the same folder -->
+  <img class="photo" src="photo.jpg" alt="Our memory">
+  <p>Our little day I'll never forget. ♥</p>
+  <button class="main x">Close</button>
+</div></div>
+
+<div class="modal" id="m3"><div class="card letter">
+  <h2>Letter From My Heart 💌</h2>
+  <p>My love, you make my life feel more beautiful and meaningful. I feel so lucky to have you.</p>
+  <p>You make me smile, you make me feel safe, and you bring so much happiness into my world.</p>
+  <p>Thank you for being you. No matter what happens, I will always choose you.</p>
+  <p style="text-align:right;color:#c0392b"><b>Always, yours ♥</b></p>
+  <button class="main x">Close</button>
+</div></div>
+
+<div class="hearts" id="hearts"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const range=$('range'),needle=$('needle');
+function react(v){
+  if(v>=500)return['😻','Correct answer!'];
+  if(v>=70)return['🥰',"Aww, that's more like it!"];
+  if(v>=30)return['😾','That hurts...'];
+  if(v>0)return['😭','Only that much?'];
+  return['🐱','How much do you love me?'];
+}
+range.oninput=()=>{
+  const v=+range.value,r=react(v);
+  $('cat').textContent=r[0];$('msg').textContent=r[1];$('pct').textContent=v+'%';
+  needle.style.transform='rotate('+(Math.min(v,500)/500*180)+'deg)';
+  $('go').disabled=v<500;
+  if(v>=500)burst();
+};
+$('go').onclick=()=>{$('s1').classList.remove('on');$('s2').classList.add('on')};
+document.querySelectorAll('.gift').forEach(b=>b.onclick=()=>{
+  $(b.dataset.m).classList.add('on');b.classList.add('done');burst();
+});
+document.querySelectorAll('.x').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('on'));
+function burst(){
+  for(let i=0;i<14;i++){
+    const s=document.createElement('span');
+    s.textContent=['💗','💖','🌸','♥'][i%4];
+    s.style.left=Math.random()*100+'%';
+    s.style.fontSize=(16+Math.random()*20)+'px';
+    s.style.animationDuration=(3+Math.random()*3)+'s';
+    $('hearts').appendChild(s);
+    setTimeout(()=>s.remove(),6500);
+  }
+}
+</script>
+</body>
+</html>
